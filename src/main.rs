@@ -7,6 +7,8 @@ fn main() {
     //ch_2();
     //ch_3();
     //ch_4();
+    //ch_5();
+    ch_6();
 }
 
 fn ch_1() {
@@ -202,7 +204,7 @@ fn ch_4() {
     //Each letter of hello is stored on the heap and is NOT copied
     fn str_rep() {
         let s1 = String::from("hello");
-        let s2 = s1;
+        let _s2 = s1;
         //println!("{s1}")  will error becuase s1 has been freed
         //This is called a move instead of a shallow copy because the first value is freed
     }
@@ -220,16 +222,16 @@ fn ch_4() {
         let y = x;
         println!("x={x},y={y}");
 
-        let s = String::from("hello");
+        let _s = String::from("hello");
         //takes_ownership(s);
-        let x = 5;
+        let _x = 5;
         //makes_copy(x); here x is does not move into the function and can be used after
     }
 
     fn ownership() {
-        let s1 = gives_ownership(); // moves its return value to s1
+        let _s1 = gives_ownership(); // moves its return value to s1
         let s2 = String::from("hello");
-        let s3 = takes_and_gives_back(s2); //s2 is moved into takes_and_gives_back, moves its return
+        let _s3 = takes_and_gives_back(s2); //s2 is moved into takes_and_gives_back, moves its return
         //value into s3
     }
     fn gives_ownership() -> String {
@@ -280,9 +282,9 @@ fn ch_4() {
     fn mulitple_muts() {
         let mut s = String::from("hello");
         {
-            let r1 = &mut s;
+            let _r1 = &mut s;
         }
-        let r2 = &mut s;
+        let _r2 = &mut s;
     }
 
     fn multiple_muts_2() {
@@ -290,7 +292,7 @@ fn ch_4() {
         let r1 = &s;
         let r2 = &s;
         println!("{r1} and {r2}");
-        let r3 = &mut s; //no problem since r1 and r2 have been used and wont be again
+        let _r3 = &mut s; //no problem since r1 and r2 have been used and wont be again
     }
 
     //here we try to return a reference to s which is dropped after dangle runs
@@ -308,7 +310,7 @@ fn ch_4() {
     //disconnected to the state of s
     fn slices() {
         let mut s = String::from("hello world");
-        let word = first_word(&s);
+        let _word = first_word(&s);
         s.clear();
     }
     //fn first_word(s: &String) -> usize {
@@ -330,4 +332,260 @@ fn ch_4() {
         }
         &s[..]
     }
+}
+fn ch_5() {
+    struct User {
+        active: bool,
+        username: String,
+        email: String,
+        sign_in_count: u64,
+    }
+    //the instance must be either entirly mutable or not
+    let mut user1 = User {
+        active: true,
+        username: String::from("someusername123"),
+        email: String::from("someone@example.com"),
+        sign_in_count: 1,
+    };
+    user1.email = String::from("anotheremail@someone.com");
+
+    fn build_user(email: String, username: String) -> User {
+        User {
+            active: true,
+            username,
+            email,
+            sign_in_count: 1,
+        }
+    }
+    //user1 become invalid after delcaring user2 becuase of the username property
+    //username is a string which doesnt have the copy trait, email is a new string
+    //and active/sign in count are bool and in types with the copy trait
+    let _user2 = User {
+        email: String::from("another@example.com"),
+        ..user1
+    };
+
+    //tuple structs
+
+    //tuple structs are different types even if they hold the same values
+    //to destructure them you must include the tuple struct type
+    struct Color(i32, i32, i32);
+    struct Point(i32, i32, i32);
+
+    let _black = Color(0, 0, 0);
+    let origin = Point(0, 0, 0);
+
+    let Point(_x, _y, _z) = origin;
+
+    //the problem with this code is that its unclear that width and height are related
+    //also our function is supposed to calculate one rectangle area but has 2 parameters
+    fn create_rectangle() {
+        let width1 = 30;
+        let height1 = 50;
+
+        println!(
+            "The area of the rectangle is {} square pixels.",
+            area(width1, height1)
+        );
+    }
+    fn area(width: u32, height: u32) -> u32 {
+        width * height
+    }
+    //create_rectangle();
+
+    struct Rectangle {
+        height: u32,
+        width: u32,
+    }
+    fn rectangle_refactor() {
+        let rect1 = Rectangle {
+            height: 30,
+            width: 50,
+        };
+        println!(
+            "The area of the rectangle is {} square pixels.",
+            area_refactor(&rect1)
+        );
+    }
+    fn area_refactor(rectangle: &Rectangle) -> u32 {
+        rectangle.height * rectangle.width
+    }
+    rectangle_refactor();
+
+    //println!(rect1) will error becuase rust does not know which format to output the struct as
+    fn debugging_structs() {
+        #[derive(Debug)]
+        struct Rectangle {
+            height: u32,
+            width: u32,
+        }
+        fn debug() {
+            let rect1 = Rectangle {
+                width: 30,
+                height: 50,
+            };
+            //:? tells println! to to use an output format called debug the # makes it object form
+            println!("rect1 is {rect1:#?}")
+        };
+        debug();
+    };
+    //debugging_structs();
+
+    fn other_debug_methods() {
+        #[derive(Debug)]
+        struct Rectangle {
+            height: u32,
+            width: u32,
+        }
+        let scale = 2;
+        let rect1 = Rectangle {
+            width: dbg!(30 * scale),
+            height: 50,
+        };
+        dbg!(&rect1);
+    }
+    //other_debug_methods();
+
+    //Methods
+
+    fn method_syntax() {
+        #[derive(Debug)]
+        struct Rectangle {
+            width: u32,
+            height: u32,
+        }
+        impl Rectangle {
+            fn area(&self) -> u32 {
+                self.width * self.height
+            }
+        }
+        let rect1 = Rectangle {
+            width: 30,
+            height: 50,
+        };
+        println!(
+            "The area of the rectabnle is {} square pixels",
+            rect1.area()
+        );
+    };
+    method_syntax();
+}
+
+fn ch_6() {
+    //structs let you group together data and fields ie Rectangle {height,width}
+    //enums let you say data is one of a possible set of values
+    enum IpAddr {
+        V4(String),
+        V6(String),
+    }
+    let _home = IpAddr::V4(String::from("12.0.0.1"));
+    let _loopback = IpAddr::V6(String::from("::1"));
+
+    //enums can have different types and amounts of data associated with them
+    enum _IpAddr2 {
+        V4(u8, u8, u8),
+        V6(String),
+    }
+
+    fn _struct_vs_enum() {
+        //Same types, difference between structs and enums
+        //Cant use the data defined with structs as easily
+        enum Message {
+            Quit,
+            Move { x: i32, y: i32 },
+            Write(String),
+            ChangeColor(i32, i32, i32),
+        }
+
+        struct QuitMessage;
+        struct MoveMessage {
+            x: i32,
+            y: i32,
+        };
+        struct WriteMessage(String);
+        struct ChangeColorMessage(i32, i32, i32);
+    }
+
+    //can define methods on enums
+    enum Message {
+        _Quit,
+        _Move { x: i32, y: i32 },
+        Write(String),
+        _ChangeColor(i32, i32, i32),
+    }
+
+    impl Message {
+        fn call(&self) {
+            //method here
+        }
+    }
+    let m = Message::Write(String::from("hello"));
+    m.call();
+
+    //How does rust deal with null?
+    //rust does not have a null type but does have an Option<T> enum
+
+    let _some_number = Some(5);
+    let _some_char = Some('e');
+    let _absent_number: Option<i32> = None;
+
+    //this will not compile because rust doesnt know exactly what type y is
+    //let x: i8 = 5;
+    //let y: Option<i8> = Some(5);
+    //let sum = x + y;
+
+    //Option<T> is used to guard against pervasive null use and its errors
+    //When using Option<T> you must narrow the cases when the data is null and it is not
+
+    //This is an exmample how how to get data out of a
+    #[derive(Debug)]
+    enum UsState {
+        _Alabama,
+        _Alaska,
+        California,
+    }
+
+    enum Coin {
+        _Penny,
+        _Nickel,
+        _Dime,
+        Quarter(UsState),
+    }
+    fn value_in_cents(coin: Coin) -> u8 {
+        match coin {
+            Coin::_Penny => 1,
+            Coin::_Nickel => 5,
+            Coin::_Dime => 10,
+            Coin::Quarter(state) => {
+                println!("State quarter from {state:?}!");
+                25
+            }
+        }
+    }
+    value_in_cents(Coin::Quarter(UsState::California));
+
+    //this pattern is seen a lot in rust
+    //match against a variable bind variable to data inside and execute code based on the match
+    fn plus_one(x: Option<i32>) -> Option<i32> {
+        match x {
+            None => None,
+            Some(i) => Some(i + 1),
+        }
+    }
+    let five = Some(5);
+    let _six = plus_one(five);
+    let _none = plus_one(None);
+
+    //other is used as a catch all here
+    //because match must be exhaustive other can be used to pass type checks
+    let dice_roll = 9;
+    match dice_roll {
+        3 => add_fancy_hat(),
+        7 => remove_fancy_hat(),
+        other => move_player(other),
+        // _ => (), can also be used if we only want code to run in the prior cases
+    }
+    fn add_fancy_hat() {};
+    fn remove_fancy_hat() {};
+    fn move_player(num_spaces: u8) {};
 }
