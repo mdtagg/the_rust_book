@@ -588,4 +588,17 @@ fn ch_6() {
     fn add_fancy_hat() {};
     fn remove_fancy_hat() {};
     fn move_player(num_spaces: u8) {};
+
+    // Using if let to bind a variable if only condition is present for a successful match case
+    // this first block is unnessary boilerplate code
+    let config_max = Some(3u8);
+    match config_max {
+        Some(max) => println!("The maximum is configured to be {max}"),
+        _ => (),
+    }
+
+    let config_max_2 = Some(3u8);
+    if let Some(max) = config_max_2 {
+        println!("The maximum is configured to be {max}");
+    }
 }
