@@ -602,3 +602,8 @@ fn ch_6() {
         println!("The maximum is configured to be {max}");
     }
 }
+
+fn ch_7() {
+    // Modules and Crates
+    //refer to restaurant package in rust folder
+}
