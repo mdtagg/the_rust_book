@@ -1,0 +1,11 @@
+error: failed searching for potential workspace
+package manifest: `/Users/mdtagg/Programming/rust/the_rust_book/ch_8_exercises/Cargo.toml`
+invalid potential workspace manifest: `/Users/mdtagg/Programming/rust/the_rust_book/Cargo.toml`
+
+help: to avoid searching for a non-existent workspace, add `[workspace]` to the package manifest
+
+Caused by:
+  failed to parse manifest at `/Users/mdtagg/Programming/rust/the_rust_book/Cargo.toml`
+
+Caused by:
+  this virtual manifest specifies a `dependencies` section, which is not allowed

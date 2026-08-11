@@ -1,8 +1,11 @@
-[package]
-name = "the_rust_book"
-version = "0.1.0"
-edition = "2024"
-
-[dependencies]
-rand = "0.8.5"
-ch_8_exercises = { path = "./ch_8_exercises" }
+[workspace]
+members = ["app",
+"ch_1",
+"ch_2",
+"ch_3",
+"ch_4",
+"ch_5",
+"ch_6",
+"ch_7",
+"ch_8",
+]
