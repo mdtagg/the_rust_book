@@ -1,4 +1,4 @@
-use ch_8::find_median_mode;
+use ch_8::{add_employee_names, convert_to_pig_latin, find_median_mode};
 fn main() {
     // creating a new vector
     //let v:Vec<i32> = Vec::new();
@@ -28,4 +28,9 @@ fn main() {
     if let Some(mode) = stats.mode {
         println!("{}", mode);
     }
+
+    let word = String::from("apple");
+    //println!("{}", convert_to_pig_latin(&word));
+    //println!("{}", convert_to_pig_latin("first"));
+    add_employee_names();
 }
